@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-helm-app
+  namespace: argocd
+  # Allows ArgoCD garbage collection to auto-delete resources when this app is deleted
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # Replace with your Git repository URL
+    repoURL: 'https://github.com/YOUR_GITHUB_USERNAME/my-k8s-repo.git'
+    targetRevision: HEAD
+    # Path inside the repo pointing to the Helm chart folder
+    path: charts/nginx
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    # Target cluster URL (in-cluster)
+    server: 'https://kubernetes.default.svc'
+    # Namespace to deploy the NGINX resources into
+    namespace: nirsingh-argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
